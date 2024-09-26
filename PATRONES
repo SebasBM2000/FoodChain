@@ -1,1 +1,82 @@
+#############################################################Patrón Prototype#############################################################
+package Modelo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+// Clase abstracta para definir el prototipo de operación (Patrón Prototype)
+public abstract class ConexionStoredProcedure implements Cloneable {
+
+    // Variable protegida para la conexión a la base de datos
+    protected Connection conexion;
+
+    // Constructor que recibe la conexión a la base de datos
+    public ConexionStoredProcedure() {
+        // Se obtiene la conexión desde el Singleton
+        this.conexion = ConexionSQLServer.getInstancia().getConexion();
+    }
+
+    // Método abstracto que cada subclase deberá implementar para ejecutar la operación específica
+    public abstract void ejecutar() throws SQLException;
+
+    // Método para clonar el prototipo
+    @Override
+    public ConexionStoredProcedure clone() {
+        try {
+            return (ConexionStoredProcedure) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+#############################################################Patrón Singleton#############################################################
+package Modelo;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConexionSQLServer {
+    
+    // Variable estática para almacenar la única instancia de la clase.
+    private static ConexionSQLServer instancia;
+    
+    // Variable para la conexión con la base de datos.
+    private Connection conexion;
+    
+    // Datos de conexión a la base de datos.
+    private final String url = "jdbc:sqlserver://localhost:1433;database=ProyectoDP_FoodChain;encrypt=false";
+    private final String usuario = "sa";
+    private final String contrasena = "012345";
+
+       
+    // Constructor privado para evitar instanciación externa (Patrón Singleton).
+    private ConexionSQLServer() {
+        try {
+            // Establecemos la conexión.
+            conexion = DriverManager.getConnection(url, usuario, contrasena);
+            System.out.println("Conexión exitosa a la base de datos SQL Server.");
+        } catch (SQLException e) {
+            // Capturamos y mostramos cualquier error en la conexión.
+            System.out.println("Error en la conexión: " + e.getMessage());
+        }
+    }
+    
+    // Método estático que devuelve la única instancia de la clase (Patrón Singleton).
+    public static ConexionSQLServer getInstancia() {
+        if (instancia == null) {
+            // Si la instancia no existe, la creamos.
+            instancia = new ConexionSQLServer();
+        }
+        // Retornamos la instancia única.
+        return instancia;
+    }
+    
+    // Método para obtener la conexión y usarla en otros componentes (Vista o Controlador).
+    public Connection getConexion() {
+        return conexion;
+    }  
+}
