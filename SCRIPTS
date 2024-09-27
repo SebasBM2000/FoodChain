@@ -346,3 +346,6 @@ BEGIN
     SELECT * FROM Rutas WHERE Estado = @Estado;
 END;
 GO
+
+-- Eliminación de la base de datos 
+-- DROP DATABASE ProyectoDP_FoodChain
