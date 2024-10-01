@@ -82,3 +82,72 @@ public class ConexionSQLServer {
 }
 
 ############################################################# Patrón Factory #############################################################
+package Controlador;
+
+import java.sql.SQLException;
+
+// Interfaz para procedimientos almacenados
+public interface IStoredProcedure {
+    void ejecutar() throws SQLException;
+}
+------------------------------------------------------------------------------------------------------------------------------------------
+package Controlador;
+
+import Modelo.ConexionStoredProcedure;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+// Clase para manejar el procedimiento almacenado InsertarUsuario
+public class InsertarUsuarioProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+
+    private String nombre;
+    private String tipoUsuario;
+    private String email;
+    private String telefono;
+    private String direccion;
+
+    public InsertarUsuarioProcedure(String nombre, String tipoUsuario, String email, String telefono, String direccion) {
+        this.nombre = nombre;
+        this.tipoUsuario = tipoUsuario;
+        this.email = email;
+        this.telefono = telefono;
+        this.direccion = direccion;
+    }
+
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC InsertarUsuario ?, ?, ?, ?, ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, nombre);
+        statement.setString(2, tipoUsuario);
+        statement.setString(3, email);
+        statement.setString(4, telefono);
+        statement.setString(5, direccion);
+
+        // Ejecuta el procedimiento almacenado
+        statement.executeUpdate();
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------
+package Controlador;
+// Factory para crear instancias de los procedimientos almacenados
+public class StoredProcedureFactory {
+
+    public IStoredProcedure crearProcedimiento(String tipo, Object... params) {
+        switch (tipo) {
+            case "InsertarUsuario":
+                return new InsertarUsuarioProcedure(
+                    (String) params[0], // nombre
+                    (String) params[1], // tipoUsuario
+                    (String) params[2], // email
+                    (String) params[3], // telefono
+                    (String) params[4]  // direccion
+                );
+            // Aquí puedes agregar más casos para otros procedimientos almacenados
+            // Ejemplo: case "InsertarExcedente":
+            //          return new InsertarExcedenteProcedure(...);
+            default:
+                throw new IllegalArgumentException("Tipo de procedimiento no reconocido: " + tipo);
+        }
+    }
+}
