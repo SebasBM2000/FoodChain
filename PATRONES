@@ -82,7 +82,7 @@ public class ConexionSQLServer {
 }
 
 ############################################################# Patrón Factory #############################################################
-package Controlador;
+package Modelo;
 
 import java.sql.SQLException;
 
@@ -91,7 +91,7 @@ public interface IStoredProcedure {
     void ejecutar() throws SQLException;
 }
 ------------------------------------------------------------------------------------------------------------------------------------------
-package Controlador;
+package Modelo;
 
 import Modelo.ConexionStoredProcedure;
 import java.sql.PreparedStatement;
@@ -129,7 +129,7 @@ public class InsertarUsuarioProcedure extends ConexionStoredProcedure implements
     }
 }
 ---------------------------------------------------------------------------------------------------------------------------------------
-package Controlador;
+package Modelo;
 // Factory para crear instancias de los procedimientos almacenados
 public class StoredProcedureFactory {
 
