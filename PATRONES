@@ -93,11 +93,11 @@ public interface IStoredProcedure {
 ------------------------------------------------------------------------------------------------------------------------------------------
 package Modelo;
 
-import Modelo.ConexionStoredProcedure;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-// Clase para manejar el procedimiento almacenado InsertarUsuario
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla InsertarUsuarioProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
 public class InsertarUsuarioProcedure extends ConexionStoredProcedure implements IStoredProcedure {
 
     private String nombre;
@@ -114,6 +114,7 @@ public class InsertarUsuarioProcedure extends ConexionStoredProcedure implements
         this.direccion = direccion;
     }
 
+    //Método que forma parte del subsistema
     @Override
     public void ejecutar() throws SQLException {
         String sql = "EXEC InsertarUsuario ?, ?, ?, ?, ?";
@@ -126,28 +127,635 @@ public class InsertarUsuarioProcedure extends ConexionStoredProcedure implements
 
         // Ejecuta el procedimiento almacenado
         statement.executeUpdate();
-    }
+    }
 }
 ---------------------------------------------------------------------------------------------------------------------------------------
 package Modelo;
-// Factory para crear instancias de los procedimientos almacenados
-public class StoredProcedureFactory {
 
-    public IStoredProcedure crearProcedimiento(String tipo, Object... params) {
-        switch (tipo) {
-            case "InsertarUsuario":
-                return new InsertarUsuarioProcedure(
-                    (String) params[0], // nombre
-                    (String) params[1], // tipoUsuario
-                    (String) params[2], // email
-                    (String) params[3], // telefono
-                    (String) params[4]  // direccion
-                );
-            // Aquí puedes agregar más casos para otros procedimientos almacenados
-            // Ejemplo: case "InsertarExcedente":
-            //          return new InsertarExcedenteProcedure(...);
-            default:
-                throw new IllegalArgumentException("Tipo de procedimiento no reconocido: " + tipo);
-        }
-    }
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla InsertarRutaProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class InsertarRutaProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private int donacionID;
+    private String conductor;
+    private String vehiculo;
+    private String fechaInicio;
+    private String fechaFin;
+    private String estado;
+
+    public InsertarRutaProcedure(int donacionID, String conductor, String vehiculo, String fechaInicio, String fechaFin, String estado) {
+        this.donacionID = donacionID;
+        this.conductor = conductor;
+        this.vehiculo = vehiculo;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.estado = estado;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC InsertarRuta ?, ?, ?, ?, ?, ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setInt(1, donacionID);
+        statement.setString(2, conductor);
+        statement.setString(3, vehiculo);
+        statement.setString(4, fechaInicio);
+        statement.setString(5, fechaFin);
+        statement.setString(6, estado);
+        statement.executeUpdate();
+    }
 }
+-----------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla InsertarRecompensaProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class InsertarRecompensaProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private int donacionID;
+    private int usuarioID;
+    private int puntos;
+    private String fechaOtorgacion;
+
+    public InsertarRecompensaProcedure(int donacionID, int usuarioID, int puntos, String fechaOtorgacion) {
+        this.donacionID = donacionID;
+        this.usuarioID = usuarioID;
+        this.puntos = puntos;
+        this.fechaOtorgacion = fechaOtorgacion;
+    }
+    
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC InsertarRecompensa ?, ?, ?, ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setInt(1, donacionID);
+        statement.setInt(2, usuarioID);
+        statement.setInt(3, puntos);
+        statement.setString(4, fechaOtorgacion);
+        statement.executeUpdate();
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla InsertarExcedenteProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class InsertarExcedenteProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+
+    private int usuarioID;
+    private String descripcion;
+    private double cantidad;
+    private String unidadMedida;
+    private String fechaCreacion;
+    private String fechaCaducidad;
+    private String estado;
+
+    public InsertarExcedenteProcedure(int usuarioID, String descripcion, double cantidad, String unidadMedida, String fechaCreacion, String fechaCaducidad, String estado) {
+        this.usuarioID = usuarioID;
+        this.descripcion = descripcion;
+        this.cantidad = cantidad;
+        this.unidadMedida = unidadMedida;
+        this.fechaCreacion = fechaCreacion;
+        this.fechaCaducidad = fechaCaducidad;
+        this.estado = estado;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC InsertarExcedente ?, ?, ?, ?, ?, ?, ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setInt(1, usuarioID);
+        statement.setString(2, descripcion);
+        statement.setDouble(3, cantidad);
+        statement.setString(4, unidadMedida);
+        statement.setString(5, fechaCreacion);
+        statement.setString(6, fechaCaducidad);
+        statement.setString(7, estado);
+
+        // Ejecuta el procedimiento almacenado
+        statement.executeUpdate();
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla InsertarDonacionProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class InsertarDonacionProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private int excedenteID;
+    private int organizacionID;
+    private String fechaAsignacion;
+    private String fechaRecoleccion;
+    private String estado;
+
+    public InsertarDonacionProcedure(int excedenteID, int organizacionID, String fechaAsignacion, String fechaRecoleccion, String estado) {
+        this.excedenteID = excedenteID;
+        this.organizacionID = organizacionID;
+        this.fechaAsignacion = fechaAsignacion;
+        this.fechaRecoleccion = fechaRecoleccion;
+        this.estado = estado;
+    }
+    
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC InsertarDonacion ?, ?, ?, ?, ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setInt(1, excedenteID);
+        statement.setInt(2, organizacionID);
+        statement.setString(3, fechaAsignacion);
+        statement.setString(4, fechaRecoleccion);
+        statement.setString(5, estado);
+        statement.executeUpdate();
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerDonacionesPorEstadoProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerDonacionesPorEstadoProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private String estado;
+
+    public ObtenerDonacionesPorEstadoProcedure(String estado) {
+        this.estado = estado;
+    }
+
+    //Método que forma parte del subsistema    
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerDonacionesPorEstado ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, estado);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado
+        while (resultSet.next()) {
+            System.out.println("DonacionID: " + resultSet.getInt("DonacionID"));
+            System.out.println("ExcedenteID: " + resultSet.getInt("ExcedenteID"));
+            System.out.println("OrganizacionID: " + resultSet.getInt("OrganizacionID"));
+            System.out.println("FechaAsignacion: " + resultSet.getString("FechaAsignacion"));
+            System.out.println("FechaRecoleccion: " + resultSet.getString("FechaRecoleccion"));
+            System.out.println("Estado: " + resultSet.getString("Estado"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerExcedentesPorEstadoProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerExcedentesPorEstadoProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+
+    private String estado;
+
+    public ObtenerExcedentesPorEstadoProcedure(String estado) {
+        this.estado = estado;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerExcedentesPorEstado ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, estado);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesa el resultado de la consulta (puedes modificar esto según tus necesidades)
+        while (resultSet.next()) {
+            System.out.println("ExcedenteID: " + resultSet.getInt("ExcedenteID"));
+            System.out.println("UsuarioID: " + resultSet.getInt("UsuarioID"));
+            System.out.println("Descripcion: " + resultSet.getString("Descripcion"));
+            System.out.println("Cantidad: " + resultSet.getDouble("Cantidad"));
+            System.out.println("UnidadMedida: " + resultSet.getString("UnidadMedida"));
+            System.out.println("FechaCreacion: " + resultSet.getString("FechaCreacion"));
+            System.out.println("FechaCaducidad: " + resultSet.getString("FechaCaducidad"));
+            System.out.println("Estado: " + resultSet.getString("Estado"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerOrganizacionPorTipoDeOrganizacionProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerOrganizacionPorTipoDeOrganizacionProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private String tipoOrganizacion;
+
+    public ObtenerOrganizacionPorTipoDeOrganizacionProcedure(String tipoOrganizacion) {
+        this.tipoOrganizacion = tipoOrganizacion;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerOrganizacionPorTipoDeOrganizacion ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, tipoOrganizacion);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado
+        while (resultSet.next()) {
+            System.out.println("OrganizacionID: " + resultSet.getInt("OrganizacionID"));
+            System.out.println("TipoOrganizacion: " + resultSet.getString("TipoOrganizacion"));
+            System.out.println("AreaCobertura: " + resultSet.getString("AreaCobertura"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerRangosPorTipoDeRecompensaProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerRangosPorTipoDeRecompensaProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private String tipoRecompensa;
+
+    public ObtenerRangosPorTipoDeRecompensaProcedure(String tipoRecompensa) {
+        this.tipoRecompensa = tipoRecompensa;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerRangosPorTipoDeRecompensa ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, tipoRecompensa);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado
+        while (resultSet.next()) {
+            System.out.println("RangoID: " + resultSet.getInt("RangoID"));
+            System.out.println("MinPuntos: " + resultSet.getInt("MinPuntos"));
+            System.out.println("MaxPuntos: " + resultSet.getInt("MaxPuntos"));
+            System.out.println("TipoRecompensa: " + resultSet.getInt("TipoRecompensa"));
+            System.out.println("Descripcion: " + resultSet.getInt("Descripcion"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerRecompensasPorUsuarioProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerRecompensasPorUsuarioProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private int usuarioID;
+
+    public ObtenerRecompensasPorUsuarioProcedure(int usuarioID) {
+        this.usuarioID = usuarioID;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerRecompensasPorUsuario ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setInt(1, usuarioID);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado
+        while (resultSet.next()) {
+            System.out.println("RecompensaID: " + resultSet.getInt("RecompensaID"));
+            System.out.println("DonacionID: " + resultSet.getInt("DonacionID"));
+            System.out.println("UsuarioID: " + resultSet.getInt("UsuarioID"));
+            System.out.println("Puntos: " + resultSet.getInt("Puntos"));
+            System.out.println("FechaOtorgacion: " + resultSet.getString("FechaOtorgacion"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Modelo;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//Esta clase cumple el rol de implementación concreta de IStoredProcedure para la tabla ObtenerRutasPorEstadoProcedure
+//Este clase cumple el rol de un subsistema de la clase StoredProcedureFacade
+public class ObtenerRutasPorEstadoProcedure extends ConexionStoredProcedure implements IStoredProcedure {
+    
+    private String estado;
+
+    public ObtenerRutasPorEstadoProcedure(String estado) {
+        this.estado = estado;
+    }
+
+    //Método que forma parte del subsistema
+    @Override
+    public void ejecutar() throws SQLException {
+        String sql = "EXEC ObtenerRutasPorEstado ?";
+        PreparedStatement statement = conexion.prepareStatement(sql);
+        statement.setString(1, estado);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado
+        while (resultSet.next()) {
+            System.out.println("RutaID: " + resultSet.getInt("RutaID"));
+            System.out.println("DonacionID: " + resultSet.getInt("DonacionID"));
+            System.out.println("Conductor: " + resultSet.getString("Conductor"));
+            System.out.println("Vehiculo: " + resultSet.getString("Vehiculo"));
+            System.out.println("FechaInicio: " + resultSet.getString("FechaInicio"));
+            System.out.println("FechaFin: " + resultSet.getString("FechaFin"));
+            System.out.println("Estado: " + resultSet.getString("Estado"));
+            System.out.println("-----------------------------");
+        }
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------
+package Controlador;
+
+    import Modelo.IStoredProcedure;
+    import Modelo.InsertarDonacionProcedure;
+    import Modelo.InsertarExcedenteProcedure;
+    import Modelo.InsertarRecompensaProcedure;
+    import Modelo.InsertarRutaProcedure;
+    import Modelo.InsertarUsuarioProcedure;
+    import Modelo.ObtenerDonacionesPorEstadoProcedure;
+    import Modelo.ObtenerExcedentesPorEstadoProcedure;
+    import Modelo.ObtenerOrganizacionPorTipoDeOrganizacionProcedure;
+    import Modelo.ObtenerRangosPorTipoDeRecompensaProcedure;
+    import Modelo.ObtenerRecompensasPorUsuarioProcedure;
+    import Modelo.ObtenerRutasPorEstadoProcedure;
+
+    // Factory para crear instancias de los procedimientos almacenados
+    public class StoredProcedureFactory {
+
+        public IStoredProcedure crearProcedimiento(String tipo, Object... params) {
+            switch (tipo) {
+
+                case "InsertarUsuario":
+                    return new InsertarUsuarioProcedure(
+                        (String) params[0], 
+                        (String) params[1], 
+                        (String) params[2], 
+                        (String) params[3], 
+                        (String) params[4]  
+                    );
+
+                case "InsertarExcedente":
+                    return new InsertarExcedenteProcedure(
+                        (int) params[0],    
+                        (String) params[1], 
+                        (double) params[2], 
+                        (String) params[3], 
+                        (String) params[4], 
+                        (String) params[5], 
+                        (String) params[6]  
+                    );
+
+                case "ObtenerExcedentesPorEstado":
+                    return new ObtenerExcedentesPorEstadoProcedure(
+                        (String) params[0]  
+                    );
+
+                case "InsertarDonacion":
+                    return new InsertarDonacionProcedure(
+                        (Integer) params[0], 
+                        (Integer) params[1], 
+                        (String) params[2], 
+                        (String) params[3], 
+                        (String) params[4]
+                );
+
+                case "ObtenerDonacionesPorEstado":
+                    return new ObtenerDonacionesPorEstadoProcedure(
+                        (String) params[0]
+                    );
+
+                case "ObtenerOrganizacionPorTipoDeOrganizacion":
+                    return new ObtenerOrganizacionPorTipoDeOrganizacionProcedure(
+                        (String) params[0]
+                    );
+
+                case "InsertarRecompensa":
+                    return new InsertarRecompensaProcedure(
+                        (Integer) params[0], 
+                        (Integer) params[1],
+                        (Integer) params[2], 
+                        (String) params[3]
+                );
+
+                case "ObtenerRecompensasPorUsuario":
+                    return new ObtenerRecompensasPorUsuarioProcedure(
+                        (Integer) params[0]
+                    );
+
+                case "ObtenerRangosPorTipoDeRecompensa":
+                    return new ObtenerRangosPorTipoDeRecompensaProcedure(
+                        (String) params[0]
+                    );
+
+                case "InsertarRuta":
+                    return new InsertarRutaProcedure(
+                        (Integer) params[0], 
+                        (String) params[1], 
+                        (String) params[2], 
+                        (String) params[3], 
+                        (String) params[4], 
+                        (String) params[5]
+                );
+
+                case "ObtenerRutasPorEstado":
+                    return new ObtenerRutasPorEstadoProcedure(
+                        (String) params[0]);
+
+                default:
+                    throw new IllegalArgumentException("Tipo de procedimiento no reconocido: " + tipo);
+            }
+        }
+    }
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Controlador;
+
+import java.sql.SQLException;
+import Modelo.IStoredProcedure;
+
+// Facade para la creación y ejecución de procedimientos almacenados
+public class StoredProcedureFacade {
+    
+    private StoredProcedureFactory factory;
+
+    public StoredProcedureFacade() {
+        this.factory = new StoredProcedureFactory();
+    }
+
+    public void insertarUsuario(String nombre, String tipoUsuario, String email, String telefono, String direccion) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("InsertarUsuario", nombre, tipoUsuario, email, telefono, direccion);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento InsertarUsuario: " + e.getMessage());
+        }
+    }
+
+    public void insertarExcedente(int usuarioID, String descripcion, double cantidad, String unidadMedida, String fechaCreacion, String fechaCaducidad, String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("InsertarExcedente", usuarioID, descripcion, cantidad, unidadMedida, fechaCreacion, fechaCaducidad, estado);
+            
+            // Aquí aplicamos el decorador con la validación de la cantidad
+            procedure = new InsertarExcedenteDecorator(procedure, cantidad);
+
+            procedure.ejecutar();  // Ejecutar con el decorador
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento InsertarExcedente: " + e.getMessage());
+        }
+    }
+
+    public void obtenerExcedentesPorEstado(String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerExcedentesPorEstado", estado);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerExcedentesPorEstado: " + e.getMessage());
+        }
+    }
+
+    public void insertarDonacion(int excedenteID, int organizacionID, String fechaAsignacion, String fechaRecoleccion, String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("InsertarDonacion", excedenteID, organizacionID, fechaAsignacion, fechaRecoleccion, estado);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento InsertarDonacion: " + e.getMessage());
+        }
+    }
+
+    public void obtenerDonacionesPorEstado(String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerDonacionesPorEstado", estado);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerDonacionesPorEstado: " + e.getMessage());
+        }
+    }
+    
+    public void obtenerOrganizacionPorTipoDeOrganizacion(String tipoOrganizacion){
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerOrganizacionPorTipoDeOrganizacion", tipoOrganizacion);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerOrganizacionPorTipoDeOrganizacion: " + e.getMessage());
+        }
+    }
+    
+    public void insertarRecompensa(int donacionID, int usuarioID, int puntos, String fechaOtorgacion) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("InsertarRecompensa", donacionID, usuarioID, puntos, fechaOtorgacion);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento InsertarRecompensa: " + e.getMessage());
+        }
+    }
+
+    public void obtenerRecompensasPorUsuario(int usuarioID) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerRecompensasPorUsuario", usuarioID);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerRecompensasPorUsuario: " + e.getMessage());
+        }
+    }
+    
+    public void ObtenerRangosPorTipoDeRecompensa(String tipoRecompensa) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerRangosPorTipoDeRecompensa", tipoRecompensa);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerRangosPorTipoDeRecompensa: " + e.getMessage());
+        }
+    }    
+    
+    public void insertarRuta(int donacionID, String conductor, String vehiculo, String fechaInicio, String fechaFin, String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("InsertarRuta", donacionID, conductor, vehiculo, fechaInicio, fechaFin, estado);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento InsertarRuta: " + e.getMessage());
+        }
+    }
+
+    public void obtenerRutasPorEstado(String estado) {
+        try {
+            IStoredProcedure procedure = factory.crearProcedimiento("ObtenerRutasPorEstado", estado);
+            procedure.ejecutar();
+        } catch (SQLException e) {
+            System.err.println("Error al ejecutar el procedimiento ObtenerRutasPorEstado: " + e.getMessage());
+        }
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Controlador;
+
+import Modelo.IStoredProcedure;
+import java.sql.SQLException;
+
+// Clase Decoradora para la funcionalidad adicional de InsertarExcedenteProcedure
+public class InsertarExcedenteDecorator implements IStoredProcedure {
+    private IStoredProcedure insertarExcedenteProcedure;
+    private double cantidad;
+
+    public InsertarExcedenteDecorator(IStoredProcedure insertarExcedenteProcedure, double cantidad) {
+        this.insertarExcedenteProcedure = insertarExcedenteProcedure;
+        this.cantidad = cantidad;
+    }
+
+    @Override
+    public void ejecutar() throws SQLException {
+        // Validación adicional antes de ejecutar el procedimiento
+        if (cantidad <= 0) {
+            System.out.println("Error: La cantidad de excedente debe ser mayor que 0.");
+            return;
+        }
+
+        // Llamar al procedimiento original
+        insertarExcedenteProcedure.ejecutar();
+        
+        // Funcionalidad adicional después de ejecutar
+        System.out.println("Excedente insertado correctamente con cantidad: " + cantidad);
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
