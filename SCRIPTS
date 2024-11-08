@@ -14,6 +14,14 @@ go
 set dateformat dmy
 go
 
+/*
+-- Nos aseguramos de que no haya conexiones activas a la base de datos, ya que SQL Server no permitirá eliminarla si está en uso
+ALTER DATABASE ProyectoDP_FoodChain SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+-- Comando para eliminar la base de datos
+DROP DATABASE ProyectoDP_FoodChain;
+*/
+
 -- Creando las tablas
 
 /* Tabla Usuarios: Esta tabla almacenará los datos de los usuarios del sistema (supermercados, restaurantes, hogares, organizaciones sin fines 
@@ -69,22 +77,22 @@ CREATE TABLE Excedentes (
     UnidadMedida NVARCHAR(50), -- Kg, Litros, etc.
     FechaCreacion DATETIME,
     FechaCaducidad DATETIME,
-    Estado NVARCHAR(50) -- Disponible, Asignado, Recogido, etc.
+    Estado NVARCHAR(50) -- Disponible, Asignado, Entregado.
 );
 go
 
 -- Ingresando valores a la tabla Excedentes
 INSERT INTO Excedentes (UsuarioID, Descripcion, Cantidad, UnidadMedida, FechaCreacion, FechaCaducidad, Estado) VALUES
-(1, 'Tomates Frescos', 50, 'Kg', '01-09-2024', '05-09-2024', 'Disponible'),
-(2, 'Pan del Día', 30, 'Kg', '01-09-2024', '02-09-2024', 'Disponible'),
-(3, 'Leche Pasteurizada', 100, 'Litros', '02-09-2024', '08-09-2024', 'Asignado'),
-(1, 'Carne de Res', 20, 'Kg', '03-09-2024', '05-09-2024', 'Disponible'),
-(4, 'Frutas Variadas', 75, 'Kg', '03-09-2024', '10-09-2024', 'Disponible'),
-(5, 'Verduras', 40, 'Kg', '04-09-2024', '08-09-2024', 'Disponible'),
-(6, 'Sopas en Lata', 200, 'Unidades', '04-09-2024', '30-12-2024', 'Disponible'),
-(7, 'Harina de Trigo', 150, 'Kg', '05-09-2024', '15-09-2024', 'Disponible'),
-(8, 'Pollo', 25, 'Kg', '06-09-2024', '10-09-2024', 'Disponible'),
-(9, 'Queso', 50, 'Kg', '07-09-2024', '12-09-2024', 'Disponible');
+(1, 'Tomate fresco', 50, '15 kg', '01-09-2024', '05-09-2024', 'Disponible'),
+(2, 'Pan del día', 30, '250 g', '01-09-2024', '02-09-2024', 'Disponible'),
+(3, 'Botella de leche Pasteurizada', 100, ' 102 litros', '02-09-2024', '08-09-2024', 'Asignado'),
+(1, 'Carne de Res', 20, '36 kg', '03-09-2024', '05-09-2024', 'Disponible'),
+(4, 'Frutas variadas', 75, ' 16 kg', '03-09-2024', '10-09-2024', 'Disponible'),
+(5, 'Verduras variadas', 40, '19 Kg', '04-09-2024', '08-09-2024', 'Disponible'),
+(6, 'Sopa en lata', 200, '220 litros', '04-09-2024', '30-12-2024', 'Disponible'),
+(7, 'Saco de harina de trigo', 150, '400 kg', '05-09-2024', '15-09-2024', 'Disponible'),
+(8, 'Pollo', 25, '57 kg', '06-09-2024', '10-09-2024', 'Disponible'),
+(9, 'Queso napolitano', 50, ' 55 kg', '07-09-2024', '12-09-2024', 'Disponible');
 
 -- Mostrando las columnas de la tabla Excedentes
 select * from Excedentes;
@@ -124,7 +132,7 @@ CREATE TABLE Donaciones (
     OrganizacionID INT FOREIGN KEY REFERENCES Usuarios(UsuarioID),
     FechaAsignacion DATETIME,
     FechaRecoleccion DATETIME,
-    Estado NVARCHAR(50) -- Asignado, Recolectado, Distribuido
+    Estado NVARCHAR(50) -- Asignado, Recolectado.
 );
 go
 
@@ -132,14 +140,14 @@ go
 INSERT INTO Donaciones (ExcedenteID, OrganizacionID, FechaAsignacion, FechaRecoleccion, Estado) VALUES
 (1, 4, '01-09-2024', '02-09-2024', 'Asignado'),
 (2, 5, '02-09-2024', '03-09-2024', 'Recolectado'),
-(3, 4, '03-09-2024', '04-09-2024', 'Distribuido'),
+(3, 4, '03-09-2024', '04-09-2024', 'Recolectado'),
 (4, 5, '03-09-2024', '04-09-2024', 'Asignado'),
 (5, 4, '04-09-2024', '05-09-2024', 'Recolectado'),
-(6, 5, '04-09-2024', '06-09-2024', 'Distribuido'),
+(6, 5, '04-09-2024', '06-09-2024', 'Recolectado'),
 (7, 4, '05-09-2024', '06-09-2024', 'Asignado'),
 (8, 5, '06-09-2024', '07-09-2024', 'Recolectado'),
-(9, 4, '07-09-2024', '08-09-2024', 'Distribuido'),
-(10, 5, '08-09-2024', '09-09-2024', 'Asignado');
+(9, 4, '07-09-2024', '08-09-2024', 'Recolectado'),
+(4, 5, '08-09-2024', '09-09-2024', 'Asignado');
 
 -- Mostrando las columnas de la tabla Donaciones
 select * from Donaciones;
@@ -169,42 +177,6 @@ END;
 GO
 
 
-/* Tabla Organizaciones: Aunque las organizaciones ya están registradas en la tabla de Usuarios, podrías tener una tabla específica para 
-información adicional de las organizaciones, si es necesario.*/
-CREATE TABLE Organizaciones (
-    OrganizacionID INT PRIMARY KEY FOREIGN KEY REFERENCES Usuarios(UsuarioID),
-    TipoOrganizacion NVARCHAR(100), -- Banco de Alimentos, ONG, etc.
-    AreaCobertura NVARCHAR(255) -- Ciudades o áreas donde operan
-);
-go
-
--- Ingresando valores a la tabla Organizaciones
-INSERT INTO Organizaciones (OrganizacionID, TipoOrganizacion, AreaCobertura) VALUES
-(1, 'ONG', 'Lima, Callao'),
-(2, 'Banco de Alimentos', 'Lima Metropolitana'),
-(3, 'ONG', 'Lima Norte'),
-(4, 'ONG', 'Lima Sur'),
-(5, 'Banco de Alimentos', 'Callao, Lima Este'),
-(6, 'ONG', 'Lima Centro'),
-(7, 'Banco de Alimentos', 'Callao'),
-(8, 'ONG', 'Lima, Callao'),
-(9, 'Banco de Alimentos', 'Lima Metropolitana'),
-(10, 'ONG', 'Lima Norte');
-
--- Mostrando las columnas de la tabla Organizaciones
-select * from Organizaciones;
-go
-
--- Creando un procedimiento almacenado para consultar las organizaciones por el Tipo de Organización
-CREATE PROCEDURE ObtenerOrganizacionPorTipoDeOrganizacion
-	@TipoOrganizacion NVARCHAR(100)
-AS
-BEGIN 
-	SELECT * FROM Organizaciones WHERE TipoOrganizacion = @TipoOrganizacion;
-END;
-GO
-
-
 /* Tabla Recompensas: Almacena las recompensas asignadas a los usuarios en función de sus donaciones. Los puntos otorgados se calculan en base 
 a la cantidad de alimentos donados, y cada recompensa está vinculada a una donación específica y a un usuario.*/
 CREATE TABLE Recompensas (
@@ -220,14 +192,14 @@ go
 INSERT INTO Recompensas (DonacionID, UsuarioID, Puntos, FechaOtorgacion) VALUES
 (1, 1, 500, '02-09-2024'),
 (2, 2, 300, '03-09-2024'),
-(3, 3, 1000, '04-09-2024'),
+(3, 3, 300, '04-09-2024'),
 (4, 4, 200, '05-09-2024'),
 (5, 5, 800, '06-09-2024'),
 (6, 6, 150, '07-09-2024'),
 (7, 7, 450, '08-09-2024'),
 (8, 8, 600, '09-09-2024'),
 (9, 9, 350, '10-09-2024'),
-(10, 10, 900, '11-09-2024');
+(10, 10, 710, '11-09-2024');
 
 -- Mostrando las columnas de la tabla Recompensas
 select * from Recompensas;
@@ -256,10 +228,10 @@ END;
 GO
 
 
-/*Tabla RangosDeRecompensas:  define los rangos de puntos necesarios para obtener diferentes tipos de recompensas, ya sean físicas o no físicas. 
+/*Tabla DetallesDeRecompensas: Define los rangos de puntos necesarios para obtener diferentes tipos de recompensas, ya sean físicas o no físicas. 
 Cada rango tiene un intervalo de puntos y describe el tipo y la naturaleza de la recompensa.*/
-CREATE TABLE RangosDeRecompensas (
-    RangoID INT PRIMARY KEY IDENTITY,
+CREATE TABLE DetallesDeRecompensas (
+    DetallesID INT PRIMARY KEY IDENTITY,
     MinPuntos INT, -- Mínimo de puntos requerido para obtener la recompensa
     MaxPuntos INT, -- Máximo de puntos que puede cubrir este rango
     TipoRecompensa NVARCHAR(50), -- Física o No Física
@@ -268,20 +240,19 @@ CREATE TABLE RangosDeRecompensas (
 go
 
 -- Ingresando valores a la tabla RangosDeRecompensas
-INSERT INTO RangosDeRecompensas (MinPuntos, MaxPuntos, TipoRecompensa, Descripcion) VALUES
-(0, 100, 'No Física', 'Descuento en la tienda en línea'),
-(101, 300, 'No Física', 'Mención en la página web'),
-(301, 500, 'Física', 'Bolsa reutilizable'),
+INSERT INTO DetallesDeRecompensas (MinPuntos, MaxPuntos, TipoRecompensa, Descripcion) VALUES
+(0, 100, 'No Física', 'Mención en la página web'),
+(101, 300, 'Física', 'Bolsa reutilizable'),
+(301, 500, 'Física', 'Cuaderno ecológico'),
 (501, 700, 'Física', 'Camisa personalizada de FoodChain'),
-(701, 1000, 'No Física', 'Certificado de agradecimiento digital'),
-(1001, 1500, 'Física', 'Cuaderno ecológico'),
-(1501, 2000, 'Física', 'Canasta de productos orgánicos'),
-(2001, 2500, 'No Física', 'Acceso a eventos especiales de FoodChain'),
-(2501, 3000, 'Física', 'Kit de cocina sostenible'),
-(3001, 5000, 'Física', 'Set de utensilios ecológicos');
+(701, 1000, 'Física', 'Kit de cocina sostenible'),
+(1001, 1300, 'No Física', 'Descuento del 25% en 3 productos de tu elección en la tienda en línea'),
+(1301, 1800, 'Física', 'Certificado de agradecimiento + 2 productos gratis al azar de la tienda en línea'),
+(1801, 2500, 'Física', 'Canastón de productos orgánicos + 1 producto gratis al azar de la tienda en línea'),
+(2501, 3200, 'No Física', 'Acceso a 1 evento presencial de FoodChain');
 
 -- Mostrando las columnas de la tabla RangosDeRecompensas
-select * from RangosDeRecompensas;
+select * from DetallesDeRecompensas;
 go
 
 -- Creando un procedimiento almacenado para consultar rangos de recompensas por el Tipo de Recompensa
@@ -289,17 +260,17 @@ CREATE PROCEDURE ObtenerRangosPorTipoDeRecompensa
 	@TipoRecompensa NVARCHAR(50)
 AS
 BEGIN
-	SELECT * FROM RangosDeRecompensas WHERE TipoRecompensa = @TipoRecompensa;
+	SELECT * FROM DetallesDeRecompensas WHERE TipoRecompensa = @TipoRecompensa;
 END;
 GO
 
 
 /* Tabla Rutas: Esta tabla gestionará las rutas de distribución de alimentos.*/
-CREATE TABLE Rutas (
+CREATE TABLE Transporte (
     RutaID INT PRIMARY KEY IDENTITY,
     DonacionID INT FOREIGN KEY REFERENCES Donaciones(DonacionID),
+	Vehiculo NVARCHAR(50),
     Conductor NVARCHAR(100),
-    Vehiculo NVARCHAR(50),
     FechaInicio DATETIME,
     FechaFin DATETIME,
     Estado NVARCHAR(50) -- Planificado, En Progreso, Completado
@@ -307,45 +278,42 @@ CREATE TABLE Rutas (
 go
 
 -- Ingresando valores a la tabla Rutas
-INSERT INTO Rutas (DonacionID, Conductor, Vehiculo, FechaInicio, FechaFin, Estado) VALUES
-(1, 'Juan Pérez', 'Camión 123', '02-09-2024', '02-09-2024', 'Completado'),
-(2, 'Luis Gómez', 'Camión 456', '03-09-2024', '03-09-2024', 'Completado'),
-(3, 'Pedro Ramírez', 'Camión 789', '04-09-2024', '04-09-2024', 'Completado'),
-(4, 'Carlos Díaz', 'Camioneta 321', '05-09-2024', '05-09-2024', 'En Progreso'),
-(5, 'Miguel Torres', 'Camioneta 654', '06-09-2024', '06-09-2024', 'Planificado'),
-(6, 'José Santos', 'Camión 987', '07-09-2024', '07-09-2024', 'Planificado'),
-(7, 'Ricardo Flores', 'Furgón 111', '08-09-2024', '08-09-2024', 'Completado'),
-(8, 'María Castro', 'Furgón 222', '09-09-2024', '09-09-2024', 'Completado'),
-(9, 'Ana Morales', 'Camión 333', '10-09-2024', '10-09-2024', 'En Progreso'),
-(10, 'Roberto Pérez', 'Camioneta 444', '11-09-2024', '11-09-2024', 'Planificado');
+INSERT INTO Transporte (DonacionID, Vehiculo, Conductor, FechaInicio, FechaFin, Estado) VALUES
+(1, 'Camión 123', 'Juan Pérez', '02-09-2024', '02-09-2024', 'Completado'),
+(2, 'Camión 456', 'Luis Gómez', '03-09-2024', '03-09-2024', 'Completado'),
+(3, 'Camión 789', 'Pedro Ramírez', '04-09-2024', '04-09-2024', 'Completado'),
+(4, 'Camioneta 321', 'Carlos Díaz', '05-09-2024', '05-09-2024', 'En Progreso'),
+(5, 'Camioneta 654', 'Miguel Torres', '06-09-2024', '06-09-2024', 'Planificado'),
+(6, 'Camión 987', 'José Santos', '07-09-2024', '07-09-2024', 'Planificado'),
+(7, 'Furgón 111', 'Ricardo Flores', '08-09-2024', '08-09-2024', 'Completado'),
+(8, 'Furgón 222', 'María Castro', '09-09-2024', '09-09-2024', 'Completado'),
+(9, 'Camión 333', 'Ana Morales', '10-09-2024', '10-09-2024', 'En Progreso'),
+(10, 'Camioneta 444', 'Roberto Pérez', '11-09-2024', '11-09-2024', 'Planificado');
 
 -- Mostrando las columnas de la tabla Rutas
-select * from Rutas;
+select * from Transporte;
 go
 
 -- Creando un procedimiento almacenado para insertar una Ruta
-CREATE PROCEDURE InsertarRuta
+CREATE PROCEDURE InsertarTransporte
     @DonacionID INT,
+	@Vehiculo NVARCHAR(50),
     @Conductor NVARCHAR(100),
-    @Vehiculo NVARCHAR(50),
     @FechaInicio DATETIME,
     @FechaFin DATETIME,
     @Estado NVARCHAR(50)
 AS
 BEGIN
-    INSERT INTO Rutas (DonacionID, Conductor, Vehiculo, FechaInicio, FechaFin, Estado)
-    VALUES (@DonacionID, @Conductor, @Vehiculo, @FechaInicio, @FechaFin, @Estado);
+    INSERT INTO Transporte (DonacionID, Vehiculo, Conductor, FechaInicio, FechaFin, Estado)
+    VALUES (@DonacionID, @Vehiculo, @Conductor, @FechaInicio, @FechaFin, @Estado);
 END;
 GO
 
 -- Creando un procedimiento almacenado para consultar rutas por Estado
-CREATE PROCEDURE ObtenerRutasPorEstado
+CREATE PROCEDURE ObtenerTransportePorEstado
     @Estado NVARCHAR(50)
 AS
 BEGIN
-    SELECT * FROM Rutas WHERE Estado = @Estado;
+    SELECT * FROM Transporte WHERE Estado = @Estado;
 END;
-GO 
-
--- Eliminación de la base de datos 
--- DROP DATABASE ProyectoDP_FoodChain
+GO
