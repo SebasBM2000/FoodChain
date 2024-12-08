@@ -759,3 +759,1569 @@ public class InsertarExcedenteDecorator implements IStoredProcedure {
     }
 }
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+###################################################### PATRÓN PROXY ###################################################################################
+package Vista;
+
+import Controlador.FacadeControlador;
+
+public class ProxyVista implements InterfaceProxy{
+    
+    private ObjetoRealProxy objetorealproxy;
+    private InsertarUsuarioGUI insertarUsuarioGUI;
+    private InsertarExcedenteGUI insertarExcedenteGUI;
+    private InsertarDonacionGUI insertarDonacionGUI;
+    private InsertarTransporteGUI insertarTransporteGUI;
+    private InsertarRecompensaGUI insertarRecompensaGUI;
+      
+    public ProxyVista(){
+        this.objetorealproxy = new ObjetoRealProxy();
+        this.insertarUsuarioGUI = new InsertarUsuarioGUI();
+        this.insertarExcedenteGUI = new InsertarExcedenteGUI();
+        this.insertarDonacionGUI = new InsertarDonacionGUI();
+        this.insertarTransporteGUI = new InsertarTransporteGUI();
+        this.insertarRecompensaGUI = new InsertarRecompensaGUI();
+    }
+       
+    @Override
+    public void agregarDatosProxy(String submoduloActual, FacadeControlador facadecontrolador) {
+        if (submoduloActual.equals("Insertar usuario")) {
+            insertarUsuarioGUI.insertarDatosUsuario(facadecontrolador);
+            objetorealproxy.agregarDatosProxy(submoduloActual,facadecontrolador);
+        }       
+        else if (submoduloActual.equals("Insertar excedente")) {
+            insertarExcedenteGUI.insertarDatosExcedente(facadecontrolador);
+            objetorealproxy.agregarDatosProxy(submoduloActual,facadecontrolador);            
+        } 
+        else if (submoduloActual.equals("Insertar donación")) {
+            insertarDonacionGUI.insertarDatosDonacion(facadecontrolador);
+            objetorealproxy.agregarDatosProxy(submoduloActual,facadecontrolador);            
+        } 
+        else if (submoduloActual.equals("Insertar transporte")) {
+            insertarTransporteGUI.insertarDatosTransporte(facadecontrolador);
+            objetorealproxy.agregarDatosProxy(submoduloActual,facadecontrolador);            
+        }
+        else if (submoduloActual.equals("Insertar recompensa")) {
+            insertarRecompensaGUI.insertarDatosRecompensa(facadecontrolador);
+            objetorealproxy.agregarDatosProxy(submoduloActual,facadecontrolador);            
+        }
+    }
+    
+    protected void limpiarCamposProxy(String submoduloActual) {
+        
+        if (submoduloActual.equals("Insertar usuario")) {
+            insertarUsuarioGUI.eliminarDatosUsuario();
+        }        
+        else if (submoduloActual.equals("Insertar excedente")) {
+            insertarExcedenteGUI.eliminarDatosExcedente();
+        }       
+        else if (submoduloActual.equals("Insertar donación")) {
+            insertarDonacionGUI.eliminarDatosDonacion();
+        }       
+        else if (submoduloActual.equals("Insertar transporte")) {
+            insertarTransporteGUI.eliminarDatosTransporte();
+        }      
+        else if (submoduloActual.equals("Insertar recompensa")) {
+            insertarRecompensaGUI.eliminarDatosRecompensa();
+        }
+    } 
+ 
+    public InsertarUsuarioGUI getInsertarUsuarioGUI() {
+        return this.insertarUsuarioGUI;
+    }
+
+    public InsertarExcedenteGUI getInsertarExcedenteGUI() {
+        return this.insertarExcedenteGUI;
+    }
+
+    public InsertarDonacionGUI getInsertarDonacionGUI() {
+        return this.insertarDonacionGUI;
+    }
+
+    public InsertarTransporteGUI getInsertarTransporteGUI() {
+        return this.insertarTransporteGUI;
+    }
+
+    public InsertarRecompensaGUI getInsertarRecompensaGUI() {
+        return this.insertarRecompensaGUI;
+    }
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+
+public interface InterfaceProxy {
+    public void agregarDatosProxy(String submoduloActual, FacadeControlador facadecontrolador);
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+public class ObjetoRealProxy extends JPanel implements InterfaceProxy {
+    
+    @Override
+    public void agregarDatosProxy(String submoduloActual, FacadeControlador facadecontrolador) {
+            JOptionPane.showMessageDialog(this,"El proceso ha finalizado que tenga un buen día.");
+    }
+    
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class InsertarDonacionGUI extends JPanel {
+
+    private JTextField idExcedenteField;
+    private JTextField idLocalDonanteField;
+    private JTextField fechaAsignacionField;
+    private JTextField fechaRecoleccionField;
+    private JComboBox<String> estadoDonacionCombo; 
+    
+    public InsertarDonacionGUI(){
+        this.idExcedenteField = new JTextField(20);
+        this.idLocalDonanteField = new JTextField(20);
+        this.fechaAsignacionField = new JTextField(20);
+        this.fechaRecoleccionField = new JTextField(20);
+        this.estadoDonacionCombo = new JComboBox<>(new String[]{"Asignado", "Recolectado"});        
+    }
+
+    protected void insertarDatosDonacion(FacadeControlador facadecontrolador){
+        if (idExcedenteField.getText().isEmpty() || idLocalDonanteField.getText().isEmpty() ||
+                fechaAsignacionField.getText().isEmpty() || fechaRecoleccionField.getText().isEmpty()) {
+            
+            JOptionPane.showMessageDialog(this, "No se pudo agregar a la base de datos, por favor complete el cuadro de detalles.");
+            return;
+        }
+        
+        try {
+            facadecontrolador.insertarDonacion(
+                    Integer.parseInt(idExcedenteField.getText()),
+                    Integer.parseInt(idLocalDonanteField.getText()),
+                    fechaAsignacionField.getText(),
+                    fechaRecoleccionField.getText(),
+                    String.valueOf(estadoDonacionCombo.getSelectedItem())
+            );
+            
+            JOptionPane.showMessageDialog(this, "Agregando los datos a la tabla Donaciones...");
+        
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al agregar a la base de datos: " + e.getMessage());
+        }        
+    }
+    
+    protected void eliminarDatosDonacion(){
+        idExcedenteField.setText("");
+        idLocalDonanteField.setText("");
+        fechaAsignacionField.setText("");
+        fechaRecoleccionField.setText("");
+        estadoDonacionCombo.setSelectedIndex(0);        
+    }
+
+    public JTextField getIdExcedenteField() {
+        return this.idExcedenteField;
+    }
+
+    public JTextField getIdLocalDonanteField() {
+        return this.idLocalDonanteField;
+    }
+
+    public JTextField getFechaAsignacionField() {
+        return this.fechaAsignacionField;
+    }
+
+    public JTextField getFechaRecoleccionField() {
+        return this.fechaRecoleccionField;
+    }
+
+    public JComboBox<String> getEstadoDonacionCombo() {
+        return this.estadoDonacionCombo;
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class InsertarExcedenteGUI extends JPanel {
+    
+    private JTextField idLocalField;
+    private JTextField descripcionExcedenteField;
+    private JTextField cantidadExcedenteField;
+    private JTextField unidadMedidaField;
+    private JTextField fechaElaboracionField;
+    private JTextField fechaCaducidadField;
+    private JComboBox<String> estadoExcedenteCombo;    
+    
+    public InsertarExcedenteGUI() {
+        this.idLocalField = new JTextField(20);
+        this.descripcionExcedenteField = new JTextField(20);
+        this.cantidadExcedenteField = new JTextField(20);
+        this.unidadMedidaField = new JTextField(20);
+        this.fechaElaboracionField = new JTextField(20);
+        this.fechaCaducidadField = new JTextField(20);
+        this.estadoExcedenteCombo = new JComboBox<>(new String[]{"Disponible", "Asignado", "Entregado"});
+    }
+    
+    protected void insertarDatosExcedente(FacadeControlador facadecontrolador){
+        if (idLocalField.getText().isEmpty() || descripcionExcedenteField.getText().isEmpty() ||
+                cantidadExcedenteField.getText().isEmpty() || unidadMedidaField.getText().isEmpty() ||
+                fechaElaboracionField.getText().isEmpty() || fechaCaducidadField.getText().isEmpty()) {
+            
+            JOptionPane.showMessageDialog(this, "No se pudo agregar a la base de datos, por favor complete el cuadro de detalles.");
+            return;
+        }
+        
+        try {
+            facadecontrolador.insertarExcedente(
+                    Integer.parseInt(idLocalField.getText()),
+                    descripcionExcedenteField.getText(),
+                    Double.parseDouble(cantidadExcedenteField.getText()),
+                    unidadMedidaField.getText(),
+                    fechaElaboracionField.getText(),
+                    fechaCaducidadField.getText(),
+                    String.valueOf(estadoExcedenteCombo.getSelectedItem())
+            );
+            
+            JOptionPane.showMessageDialog(this, "Agregando los datos a la tabla Excedentes...");
+        
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al agregar a la base de datos: " + e.getMessage());
+        }
+    }
+    
+    protected void eliminarDatosExcedente(){
+        idLocalField.setText("");
+        descripcionExcedenteField.setText("");
+        cantidadExcedenteField.setText("");
+        unidadMedidaField.setText("");
+        fechaElaboracionField.setText("");
+        fechaCaducidadField.setText("");
+        estadoExcedenteCombo.setSelectedIndex(0);        
+    }
+
+    public JTextField getIdLocalField() {
+        return this.idLocalField;
+    }
+
+    public JTextField getDescripcionExcedenteField() {
+        return this.descripcionExcedenteField;
+    }
+
+    public JTextField getCantidadExcedenteField() {
+        return this.cantidadExcedenteField;
+    }
+
+    public JTextField getUnidadMedidaField() {
+        return this.unidadMedidaField;
+    }
+
+    public JTextField getFechaElaboracionField() {
+        return this.fechaElaboracionField;
+    }
+
+    public JTextField getFechaCaducidadField() {
+        return this.fechaCaducidadField;
+    }
+
+    public JComboBox<String> getEstadoExcedenteCombo() {
+        return this.estadoExcedenteCombo;
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class InsertarRecompensaGUI extends JPanel {
+    
+    private JTextField idDonacionRecompensaField;
+    private JTextField idLocalDonanteRecompensaField;
+    private JTextField puntosObtenidosField;
+    private JTextField fechaOtorgacionField;
+    
+    public InsertarRecompensaGUI(){
+        this.idDonacionRecompensaField = new JTextField(20);
+        this.idLocalDonanteRecompensaField = new JTextField(20);
+        this.puntosObtenidosField = new JTextField(20);
+        this.fechaOtorgacionField = new JTextField(20);        
+    }
+    
+    protected void insertarDatosRecompensa(FacadeControlador facadecontrolador){
+        if (idDonacionRecompensaField.getText().isEmpty() || idLocalDonanteRecompensaField.getText().isEmpty() ||
+                puntosObtenidosField.getText().isEmpty() || fechaOtorgacionField.getText().isEmpty()) {
+            
+            JOptionPane.showMessageDialog(this, "No se pudo agregar a la base de datos, por favor complete el cuadro de detalles.");
+            return;
+        }
+        
+        try {
+            facadecontrolador.insertarRecompensa(
+                    Integer.parseInt(idDonacionRecompensaField.getText()),
+                    Integer.parseInt(idLocalDonanteRecompensaField.getText()),
+                    Integer.parseInt(puntosObtenidosField.getText()),
+                    fechaOtorgacionField.getText()
+            );
+            
+            JOptionPane.showMessageDialog(this, "Agregando los datos a la tabla Recompensas...");
+        
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al agregar recompensa: " + e.getMessage());
+        }        
+    }
+    
+    protected void eliminarDatosRecompensa(){
+        idDonacionRecompensaField.setText("");
+        idLocalDonanteRecompensaField.setText("");
+        puntosObtenidosField.setText("");
+        fechaOtorgacionField.setText("");        
+    }
+    
+    public JTextField getIdDonacionRecompensaField() {
+        return this.idDonacionRecompensaField;
+    }
+
+    public JTextField getIdLocalDonanteRecompensaField() {
+        return this.idLocalDonanteRecompensaField;
+    }
+
+    public JTextField getPuntosObtenidosField() {
+        return this.puntosObtenidosField;
+    }
+
+    public JTextField getFechaOtorgacionField() {
+        return this.fechaOtorgacionField;
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class InsertarTransporteGUI extends JPanel {
+    
+    private JTextField idDonacionField;
+    private JTextField descripcionVehiculoField;
+    private JTextField nombreConductorField;
+    private JTextField fechaSalidaVehiculoField;
+    private JTextField fechaEntregaVehiculoField;
+    private JComboBox<String> estadoTransporteCombo;
+    
+    public InsertarTransporteGUI(){
+        this.idDonacionField = new JTextField(20);
+        this.descripcionVehiculoField = new JTextField(20);
+        this.nombreConductorField = new JTextField(20);
+        this.fechaSalidaVehiculoField = new JTextField(20);
+        this.fechaEntregaVehiculoField = new JTextField(20);
+        this.estadoTransporteCombo = new JComboBox<>(new String[]{"Planificado", "En progreso", "Completado"});        
+    }   
+    
+    protected void insertarDatosTransporte(FacadeControlador facadecontrolador){
+        if (idDonacionField.getText().isEmpty() || descripcionVehiculoField.getText().isEmpty() ||
+                nombreConductorField.getText().isEmpty() || fechaSalidaVehiculoField.getText().isEmpty() ||
+                fechaEntregaVehiculoField.getText().isEmpty()) {
+            
+            JOptionPane.showMessageDialog(this, "No se pudo agregar a la base de datos, por favor complete el cuadro de detalles.");
+            return;
+        }
+        
+        try {
+            facadecontrolador.insertarTransporte(
+                    Integer.parseInt(idDonacionField.getText()),
+                    descripcionVehiculoField.getText(),
+                    nombreConductorField.getText(),
+                    fechaSalidaVehiculoField.getText(),
+                    fechaEntregaVehiculoField.getText(),
+                    String.valueOf(estadoTransporteCombo.getSelectedItem())
+            );
+            
+            JOptionPane.showMessageDialog(this, "Agregando los datos a la tabla Transporte...");
+        
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al agregar a la base de datos: " + e.getMessage());
+        }
+    }
+    
+    protected void eliminarDatosTransporte(){
+        idDonacionField.setText("");
+        descripcionVehiculoField.setText("");
+        nombreConductorField.setText("");
+        fechaSalidaVehiculoField.setText("");
+        fechaEntregaVehiculoField.setText("");
+        estadoTransporteCombo.setSelectedIndex(0);        
+    }
+    
+    public JTextField getIdDonacionField() {
+        return this.idDonacionField;
+    }
+
+    public JTextField getDescripcionVehiculoField() {
+        return this.descripcionVehiculoField;
+    }
+
+    public JTextField getNombreConductorField() {
+        return this.nombreConductorField;
+    }
+
+    public JTextField getFechaSalidaVehiculoField() {
+        return this.fechaSalidaVehiculoField;
+    }
+
+    public JTextField getFechaEntregaVehiculoField() {
+        return this.fechaEntregaVehiculoField;
+    }
+
+    public JComboBox<String> getEstadoTransporteCombo() {
+        return this.estadoTransporteCombo;
+    }    
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class InsertarUsuarioGUI extends JPanel {
+    
+    private JTextField nombreLocalField;
+    private JTextField tipoLocalField;
+    private JTextField emailField;
+    private JTextField telefonoField;
+    private JTextField direccionField;
+    
+    public InsertarUsuarioGUI(){
+        this.nombreLocalField = new JTextField(20);
+        this.tipoLocalField = new JTextField(20);
+        this.emailField = new JTextField(20);
+        this.telefonoField = new JTextField(20);
+        this.direccionField = new JTextField(20);
+    }    
+    
+    protected void insertarDatosUsuario(FacadeControlador facadecontrolador) {
+        if (nombreLocalField.getText().isEmpty() || tipoLocalField.getText().isEmpty() ||
+                emailField.getText().isEmpty() || telefonoField.getText().isEmpty() ||
+                direccionField.getText().isEmpty()) {
+            
+            JOptionPane.showMessageDialog(this, "No se pudo agregar a la base de datos, por favor complete el cuadro de detalles.");
+            return;
+        }
+            
+        try {
+            facadecontrolador.insertarUsuario(
+                    nombreLocalField.getText(),
+                    tipoLocalField.getText(),
+                    emailField.getText(),
+                    telefonoField.getText(),
+                    direccionField.getText()
+            );   
+            
+            JOptionPane.showMessageDialog(this, "Agregando los datos a la tabla Usuarios...");
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al agregar a la base de datos: " + e.getMessage());
+        }
+    }
+    
+    protected void eliminarDatosUsuario(){        
+        nombreLocalField.setText("");
+        tipoLocalField.setText("");
+        emailField.setText("");
+        telefonoField.setText("");
+        direccionField.setText("");     
+    }
+    
+    public JTextField getNombreLocalField() {
+        return this.nombreLocalField;
+    }
+
+    public JTextField getTipoLocalField() {
+        return this.tipoLocalField;
+    }
+
+    public JTextField getEmailField() {
+        return this.emailField;
+    }
+
+    public JTextField getTelefonoField() {
+        return this.telefonoField;
+    }
+
+    public JTextField getDireccionField() {
+        return this.direccionField;
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+public class ObtenerDonacionesPorEstadoGUI extends JPanel {
+    
+    // Método para actualizar la tabla según la opción seleccionada
+    protected void actualizarTablaDonaciones(JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0); // Limpiar la tabla
+        
+        try {
+            // Obtener la opción seleccionada del desplegable
+            String opcionSeleccionada = (String) comboBoxOpcionesAjuste.getSelectedItem();
+
+            // Mostrar tabla con los 2 estados
+            if ("Mostrar tabla con los 2 estados".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaDonaciones("Asignado", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaDonaciones("Recolectado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Asignado'
+            else if ("Mostrar tabla con estado 'Asignado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaDonaciones("Asignado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Recolectado'
+            else if ("Mostrar tabla con estado 'Recolectado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaDonaciones("Recolectado", facadecontrolador, tableModel);
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Método para obtener datos desde la consola según el estado seleccionado
+    protected void obtenerDatosDesdeConsolaDonaciones(String estado, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        // Redirigir la salida de consola a un Stream
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        // Llamar al controlador para ejecutar el procedimiento para un estado específico
+        facadecontrolador.obtenerDonacionesPorEstado(estado);
+
+        // Restaurar la salida de consola
+        System.setOut(originalOut);
+
+        // Procesar la salida capturada
+        String[] filas = baos.toString().split("\n");
+        Object[] filaActual = new Object[6];
+        int index = 0;
+
+        for (String linea : filas) {
+            String[] partes = linea.split(": ");
+            if (partes.length > 1) {
+                filaActual[index] = partes[1];
+                index++;
+                if (index == 6) {
+                    tableModel.addRow(filaActual);
+                    filaActual = new Object[6];
+                    index = 0;
+                }
+            }
+        }
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+public class ObtenerExcedentesPorEstadoGUI extends JPanel {
+    
+    // Método para actualizar la tabla según la opción seleccionada
+    protected void actualizarTablaExcedentes(JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0); // Limpiar la tabla
+        
+        try {
+            // Obtener la opción seleccionada del desplegable
+            String opcionSeleccionada = (String) comboBoxOpcionesAjuste.getSelectedItem(); 
+            
+            // Mostrar tabla con los 3 estados
+            if ("Mostrar tabla con los 3 estados".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaExcedentes("Asignado", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaExcedentes("Disponible", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaExcedentes("Entregado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Asignado'
+            else if ("Mostrar tabla con estado 'Asignado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaExcedentes("Asignado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Disponible'
+            else if ("Mostrar tabla con estado 'Disponible'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaExcedentes("Disponible", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Entregado'
+            else if ("Mostrar tabla con estado 'Entregado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaExcedentes("Entregado", facadecontrolador, tableModel);                
+            }
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }    
+    
+    // Método para obtener datos desde la consola según el estado seleccionado
+    protected void obtenerDatosDesdeConsolaExcedentes(String estado, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        // Redirigir la salida de consola a un Stream
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+        facadecontrolador = new FacadeControlador(); // Instancia del controlador
+        
+        // Llamar al controlador para ejecutar el procedimiento para un estado específico
+        facadecontrolador.obtenerExcedentesPorEstado(estado);
+
+        // Restaurar la salida de consola
+        System.setOut(originalOut);
+
+        // Procesar la salida capturada
+        String[] filas = baos.toString().split("\n");
+        Object[] filaActual = new Object[8];
+        int index = 0;
+
+        for (String linea : filas) {
+            String[] partes = linea.split(": ");
+            if (partes.length > 1) {
+                filaActual[index] = partes[1];
+                index++;
+                if (index == 8) {
+                    tableModel.addRow(filaActual);
+                    filaActual = new Object[8];
+                    index = 0;
+                }
+            }
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+public class ObtenerRangosPorTipoDeRecompensaGUI extends JPanel {
+    
+    // Método para actualizar la tabla según la opción seleccionada
+    protected void actualizarTablaRangos(JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0); // Limpiar la tabla
+        try {
+            // Obtener la opción seleccionada del desplegable
+            String opcionSeleccionada = (String) comboBoxOpcionesAjuste.getSelectedItem();
+
+            // Mostrar tabla con los 2 tipos de recompensas
+            if ("Mostrar tabla con los 2 tipos de recompensas".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaRangos("Física", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaRangos("No Física", facadecontrolador, tableModel);
+
+            }
+            // Mostrar tabla con tipo de recompensa 'Física'
+            else if ("Mostrar tabla con tipo de recompensa 'Física'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaRangos("Física", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con tipo de recompensa 'No Física'
+            else if ("Mostrar tabla con tipo de recompensa 'No Física'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaRangos("No Física", facadecontrolador, tableModel);
+            }
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // Método para obtener datos desde la consola según el tipo de recompensa seleccionado
+    protected void obtenerDatosDesdeConsolaRangos(String tipoRecompensa, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        // Redirigir la salida de consola a un Stream
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        // Llamar al controlador para ejecutar el procedimiento para un estado específico
+        facadecontrolador.ObtenerRangosPorTipoDeRecompensa(tipoRecompensa);
+
+        // Restaurar la salida de consola
+        System.setOut(originalOut);
+
+        // Procesar la salida capturada
+        String[] filas = baos.toString().split("\n");
+        Object[] filaActual = new Object[5];
+        int index = 0;
+
+        for (String linea : filas) {
+            String[] partes = linea.split(": ");
+            if (partes.length > 1) {
+                filaActual[index] = partes[1];
+                index++;
+                if (index == 5) {
+                    tableModel.addRow(filaActual);
+                    filaActual = new Object[5];
+                    index = 0;
+                }
+            }
+        }
+    }   
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+public class ObtenerRecompensasPorUsuarioGUI extends JPanel {
+    
+    // Método para validar que el número sea un entero positivo
+    private int validarNumeroPositivo(String textoNumero) {
+        int numero = 0;
+
+        try {
+            numero = Integer.parseInt(textoNumero);
+            if (numero <= 0) {
+                JOptionPane.showMessageDialog(this, "El número debe ser un entero positivo.");
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El valor ingresado no es un número entero positivo.");
+        }
+        return numero;
+    }
+    
+    // Método para actualizar la tabla según el número ingresado
+    protected void actualizarTablaRecompensas(JTextField textFieldNumero, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0); // Limpiar la tabla
+        
+        // Obtener el número ingresado
+        String textoNumero = textFieldNumero.getText();
+        
+        int numero = validarNumeroPositivo(textoNumero); 
+        
+        if (numero > 0) {
+            // Redirigir la salida de consola para capturar los datos impresos
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream originalOut = System.out;
+            PrintStream printStream = new PrintStream(baos);
+            System.setOut(printStream);
+
+            // Llamar al controlador para obtener las recompensas por usuario
+            facadecontrolador.obtenerRecompensasPorUsuario(numero);
+
+            // Restaurar la salida de consola
+            System.setOut(originalOut);
+
+            // Procesar la salida capturada
+            String[] filas = baos.toString().split("\n");
+            Object[] filaActual = new Object[5];
+            int index = 0;
+
+            // Recorrer las filas y agregarlas a la tabla
+            for (String linea : filas) {
+                String[] partes = linea.split(": ");
+                if (partes.length > 1) {
+                    filaActual[index] = partes[1];
+                    index++;
+                    if (index == 5) {
+                        tableModel.addRow(filaActual);
+                        filaActual = new Object[5];
+                        index = 0;
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Se ha actualizado correctamente la tabla 'Recompensas' en el cuadro de detalles");
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+public class ObtenerTransportePorEstadoGUI extends JPanel {
+    
+    // Método para actualizar la tabla según la opción seleccionada
+    protected void actualizarTablaTransportes(JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0); // Limpiar la tabla
+        try {
+            // Obtener la opción seleccionada del desplegable
+            String opcionSeleccionada = (String) comboBoxOpcionesAjuste.getSelectedItem();
+
+            // Mostrar tabla con los 3 estados
+            if ("Mostrar tabla con los 3 estados".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaTransportes("Completado", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaTransportes("En Progreso", facadecontrolador, tableModel);
+                obtenerDatosDesdeConsolaTransportes("Planificado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Completado'
+            else if ("Mostrar tabla con estado 'Completado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaTransportes("Completado", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'En Progreso'
+            else if ("Mostrar tabla con estado 'En Progreso'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaTransportes("En Progreso", facadecontrolador, tableModel);
+            }
+            // Mostrar tabla con estado 'Planificado'
+            else if ("Mostrar tabla con estado 'Planificado'".equals(opcionSeleccionada)) {
+                obtenerDatosDesdeConsolaTransportes("Planificado", facadecontrolador, tableModel);                
+            }
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Método para obtener datos desde la consola según el estado seleccionado
+    protected void obtenerDatosDesdeConsolaTransportes(String estado, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        // Redirigir la salida de consola a un Stream
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        // Llamar al controlador para ejecutar el procedimiento para un estado específico
+        facadecontrolador.obtenerTransportePorEstado(estado);
+
+        // Restaurar la salida de consola
+        System.setOut(originalOut);
+
+        // Procesar la salida capturada
+        String[] filas = baos.toString().split("\n");
+        Object[] filaActual = new Object[7];
+        int index = 0;
+
+        for (String linea : filas) {
+            String[] partes = linea.split(": ");
+            if (partes.length > 1) {
+                filaActual[index] = partes[1];
+                index++;
+                if (index == 7) {
+                    tableModel.addRow(filaActual);
+                    filaActual = new Object[7];
+                    index = 0;
+                }
+            }
+        }
+    }
+}
+###################################################### PATRÓN OBSERVER ###################################################################################
+package Vista;
+
+import Controlador.FacadeControlador;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+public class SujetoObserver {
+    
+    private List<InterfaceObserver> sujetos = new ArrayList<>();
+     
+    public void añadir(InterfaceObserver observer){
+        sujetos.add(observer);
+    }
+    
+    public void eliminar (InterfaceObserver observer){
+        sujetos.remove(observer);
+    }
+    
+    public void actualizar(String submodulo, JTextField textFieldNumero, JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel){
+        for (InterfaceObserver sujeto : sujetos){
+            sujeto.update(submodulo, textFieldNumero, comboBoxOpcionesAjuste, facadecontrolador, tableModel);
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import Controlador.FacadeControlador;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+
+public interface InterfaceObserver {
+    void update(String submodulo, JTextField textFieldNumero, JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel);
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import javax.swing.JComboBox;
+import Controlador.FacadeControlador;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+public class ObserverVista implements InterfaceObserver {
+    
+    String nombreTabla;
+    ObtenerDonacionesPorEstadoGUI obtenerdonacionesporestadoGUI;
+    ObtenerExcedentesPorEstadoGUI obtenerexcedentesporestadoGUI;
+    ObtenerRangosPorTipoDeRecompensaGUI obtenerrangosportipoderecompensaGUI;
+    ObtenerRecompensasPorUsuarioGUI obtenerrecompensasporusuarioGUI;
+    ObtenerTransportePorEstadoGUI obtenertransporteporestadoGUI;
+    
+    public ObserverVista(String nombreTabla){
+        this.nombreTabla = nombreTabla;
+        this.obtenerdonacionesporestadoGUI = new ObtenerDonacionesPorEstadoGUI();
+        this.obtenerexcedentesporestadoGUI = new ObtenerExcedentesPorEstadoGUI();
+        this.obtenerrangosportipoderecompensaGUI = new ObtenerRangosPorTipoDeRecompensaGUI();
+        this.obtenerrecompensasporusuarioGUI = new ObtenerRecompensasPorUsuarioGUI();
+        this.obtenertransporteporestadoGUI = new ObtenerTransportePorEstadoGUI();
+    }
+
+    public void actualizarTablasObserver(String submodulo, JTextField textFieldNumero, JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel){
+        if (submodulo.equals("Obtener excedentes por estado")){
+            obtenerexcedentesporestadoGUI.actualizarTablaExcedentes(comboBoxOpcionesAjuste, facadecontrolador, tableModel);           
+        }
+        if (submodulo.equals("Obtener donaciones por estado")){
+            obtenerdonacionesporestadoGUI.actualizarTablaDonaciones(comboBoxOpcionesAjuste, facadecontrolador, tableModel);
+        }
+        if (submodulo.equals("Obtener recompensas por usuario")){
+            obtenerrecompensasporusuarioGUI.actualizarTablaRecompensas(textFieldNumero, facadecontrolador, tableModel);
+        }
+        if (submodulo.equals("Obtener rangos por tipo de recompensa")){
+            obtenerrangosportipoderecompensaGUI.actualizarTablaRangos(comboBoxOpcionesAjuste, facadecontrolador, tableModel);
+        }
+        if (submodulo.equals("Obtener transporte por estado")){
+            obtenertransporteporestadoGUI.actualizarTablaTransportes(comboBoxOpcionesAjuste, facadecontrolador, tableModel);
+        }
+    }
+
+    @Override
+    public void update(String submodulo, JTextField textFieldNumero, JComboBox<String> comboBoxOpcionesAjuste, FacadeControlador facadecontrolador, DefaultTableModel tableModel) {
+        actualizarTablasObserver(submodulo, textFieldNumero, comboBoxOpcionesAjuste, facadecontrolador, tableModel);
+        if (submodulo.equals("Obtener excedentes por estado") || submodulo.equals("Obtener donaciones por estado") || submodulo.equals("Obtener rangos por tipo de recompensa") || submodulo.equals("Obtener transporte por estado")){
+            JOptionPane.showMessageDialog(null, "Se ha actualizado correctamente la tabla " + nombreTabla + " en el cuadro de detalles");
+        }
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+###################################################### PATRÓN MEMENTO ###################################################################################
+package Vista;
+
+import java.awt.Color;
+import javax.swing.JButton;
+import javax.swing.UIManager;
+
+public class OriginatorMemento {
+    JButton submoduloBtn;
+    private String coloractual;
+    private String colorguardado;
+    
+    public void setColor(String coloractual) {
+        this.coloractual = coloractual;
+    }
+
+    public MementoVista save() {
+        colorguardado = coloractual;
+        return new MementoVista(colorguardado);
+    }
+
+    public MementoVista restore(MementoVista memento, JButton submoduloBtn) {
+        colorguardado = memento.getEliminarColor();
+        return new MementoVista(colorguardado);        
+    }
+
+    public Color getColorActual() {       
+        if(colorguardado.equals("Verde Limón")){
+            return new Color(204, 255, 0);
+        }        
+        if(colorguardado.equals("Naranja Claro")){
+            return new Color(255, 165, 0);
+        }        
+        return new Color(204, 225, 255);
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import java.util.Stack;
+import javax.swing.JButton;
+
+public class CaretakerMemento {
+    private  Stack<MementoVista> memento = new Stack<>();
+    
+    public void save(OriginatorMemento originator){
+        memento.push(originator.save());
+    }
+    
+    public void undo(OriginatorMemento originator, JButton submoduloBtn){
+       if(!memento.isEmpty()){
+           originator.restore(memento.pop(), submoduloBtn);
+       } 
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import Controlador.FacadeControlador;
+import javax.swing.table.DefaultTableModel;
+
+public class VentanaGUI extends JFrame {
+    
+    private JPanel cuadroDetalles;    
+    private JPanel panelModulos;
+    private JPanel panelSubmodulos;
+    private JButton agregarBtn;
+    private JButton limpiarBtn;
+    private JButton buttonActualizar;
+    private String submoduloActual;
+    private ProxyVista proxyvista;
+    private ObserverVista observervista;
+    private SujetoObserver sujetoobserver;
+    private OriginatorMemento originatormemento;
+    private CaretakerMemento caretakermemento;
+    private JComboBox<String> comboBoxOpcionesAjuste;
+    private DefaultTableModel tableModel;
+    private JTable tableExcedentes;
+    private JTable tableDonaciones;
+    private JTable tableRecompensas;
+    private JTable tableRangos;
+    private JTable tableTransportes;
+    private JTextField textFieldNumero;
+    private JScrollPane scrollPane;
+    
+    public VentanaGUI(){
+        proxyvista = new ProxyVista();
+        sujetoobserver = new SujetoObserver();
+        originatormemento = new OriginatorMemento();
+        caretakermemento = new CaretakerMemento();
+        
+        setTitle("Página de la interfaz de FoodChain");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
+        setVisible(true);
+                     
+        // Título central dentro de la interfaz
+        JPanel tituloPanelCentral = new JPanel();
+        JLabel tituloCentral = new JLabel("FOODCHAIN: REDUCCIÓN DEL DESPERDICIO DE ALIMENTOS Y DISTRIBUCIÓN SOLIDARIA", JLabel.CENTER);
+        tituloCentral.setFont(new Font("Arial", Font.BOLD, 14));
+        tituloPanelCentral.add(tituloCentral);
+        add(tituloPanelCentral, BorderLayout.PAGE_START);
+
+        // Panel principal para organizar módulos, submódulos y cuadro de detalles
+        JPanel panelCentral = new JPanel(new BorderLayout());
+        add(panelCentral, BorderLayout.CENTER);
+
+        // Panel de módulos en la parte superior del cuadro de detalles
+        panelModulos = new JPanel();
+        panelModulos.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        panelModulos.setBorder(BorderFactory.createTitledBorder("Módulos"));
+        panelCentral.add(panelModulos, BorderLayout.NORTH);
+
+        // Panel de submodulos (a la izquierda del cuadro de detalles)
+        panelSubmodulos = new JPanel();
+        panelSubmodulos.setLayout(new GridLayout(0, 1, 5, 5));
+        panelSubmodulos.setBorder(BorderFactory.createTitledBorder("Submódulos"));
+        panelCentral.add(panelSubmodulos, BorderLayout.WEST);
+
+        // Panel central de detalles con tamaño fijo, ahora como JPanel para agregar campos
+        cuadroDetalles = new JPanel();
+        cuadroDetalles.setLayout(new GridLayout(7, 2, 5, 5));
+        cuadroDetalles.setBorder(BorderFactory.createTitledBorder("Cuadro de detalles"));
+        panelCentral.add(new JScrollPane(cuadroDetalles), BorderLayout.CENTER);
+      
+        // Panel de botones (para agregar y limpiar, solo visible en módulo "Insertar datos")
+        JPanel panelBotones = new JPanel();
+        agregarBtn = new JButton("AGREGAR A LA BASE DE DATOS");
+        limpiarBtn = new JButton("LIMPIAR CUADRO");
+        panelBotones.add(agregarBtn);
+        panelBotones.add(limpiarBtn);
+        agregarBtn.setVisible(false);
+        limpiarBtn.setVisible(false);
+        add(panelBotones, BorderLayout.SOUTH);      
+        
+        // Inicializar módulos y submódulos
+        inicializarModulos(); 
+             
+        // Añadir funcionalidad a los botones de agregar y limpiar
+        agregarBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                agregarDatos();
+            }
+        });  
+        
+        limpiarBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampos();
+            }
+        }); 
+    }
+    
+    private void inicializarModulos() {
+        String[] modulos = {"Insertar datos", "Obtener datos"};
+        for (String modulo : modulos) {
+            JButton moduloBtn = new JButton(modulo);
+            moduloBtn.addActionListener(new ModuloSeleccionadoListener(modulo));
+            panelModulos.add(moduloBtn);
+        }
+    }
+    
+    private class ModuloSeleccionadoListener implements ActionListener {
+        private String modulo;
+
+        public ModuloSeleccionadoListener(String modulo) {
+            this.modulo = modulo;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            mostrarSubmodulos(modulo);
+            if (modulo.equals("Insertar datos")) {
+                agregarBtn.setVisible(true);
+                limpiarBtn.setVisible(true);     
+            } else {
+                agregarBtn.setVisible(false);
+                limpiarBtn.setVisible(false);   
+            }
+
+        }
+    }
+
+    private void mostrarSubmodulos(String modulo) {
+        panelSubmodulos.removeAll();
+
+        String[] submodulos;
+        if (modulo.equals("Insertar datos")) {
+            submodulos = new String[]{"Insertar usuario", "Insertar excedente", "Insertar donación", "Insertar transporte", "Insertar recompensa"};
+        } else {
+            submodulos = new String[]{"Obtener excedentes por estado", "Obtener donaciones por estado", 
+                "Obtener recompensas por usuario", "Obtener rangos por tipo de recompensa", "Obtener transporte por estado"};
+        }
+
+        Dimension buttonSize = new Dimension(180, 30);
+        for (String submodulo : submodulos) {
+            JButton submoduloBtn = new JButton("<html><center>" + submodulo + "</center></html>");
+            submoduloBtn.setPreferredSize(buttonSize);
+            submoduloBtn.setBackground(new Color(204, 225, 255));
+            submoduloBtn.addActionListener(new SubmoduloSeleccionadoListener(submodulo, modulo, submoduloBtn));        
+            panelSubmodulos.add(submoduloBtn);           
+        }
+        
+        panelSubmodulos.revalidate();
+        panelSubmodulos.repaint();
+    }
+    
+    private class SubmoduloSeleccionadoListener implements ActionListener {
+        private String submodulo;
+        private String modulo;
+        private JButton submoduloBtn;
+
+        public SubmoduloSeleccionadoListener(String submodulo, String modulo, JButton submoduloBtn) {
+            this.submodulo = submodulo;
+            this.modulo = modulo;
+            this.submoduloBtn = submoduloBtn;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            actualizarCuadroDetalles(submodulo, modulo, submoduloBtn);
+        }
+    }
+    
+    private void ColorearBoton (String submodulo, JButton submoduloBtn) {
+        if (submodulo.equals("Insertar usuario") || submodulo.equals("Insertar excedente") || submodulo.equals("Insertar donación") || submodulo.equals("Insertar transporte") || submodulo.equals("Insertar recompensa")) { 
+            originatormemento.setColor("Verde Limón");
+            caretakermemento.save(originatormemento);
+            submoduloBtn.setBackground(originatormemento.getColorActual());   
+            caretakermemento.undo(originatormemento, submoduloBtn);           
+        }        
+        if (submodulo.equals("Obtener datos") || submodulo.equals("Obtener excedentes por estado") || submodulo.equals("Obtener donaciones por estado") || submodulo.equals("Obtener recompensas por usuario") || submodulo.equals("Obtener rangos por tipo de recompensa") || submodulo.equals("Obtener transporte por estado")){
+            originatormemento.setColor("Naranja Claro");
+            caretakermemento.save(originatormemento);
+            submoduloBtn.setBackground(originatormemento.getColorActual());   
+            caretakermemento.undo(originatormemento, submoduloBtn);            
+        }           
+    }
+   
+    private void actualizarCuadroDetalles(String submodulo, String modulo, JButton submoduloBtn) {
+        
+        // Cambiar a la disposición inicial de cuadroDetalles
+        cuadroDetalles.setLayout(new GridLayout(7, 2, 5, 5));
+        
+        // Borra todos los componentes
+        cuadroDetalles.removeAll();
+   
+        if (modulo.equals("Insertar datos")) {
+                    
+            if (submodulo.equals("Insertar usuario")) { 
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                cuadroDetalles.add(new JLabel("Nombre del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarUsuarioGUI().getNombreLocalField());
+
+                cuadroDetalles.add(new JLabel("Tipo del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarUsuarioGUI().getTipoLocalField());
+
+                cuadroDetalles.add(new JLabel("Email del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarUsuarioGUI().getEmailField());
+
+                cuadroDetalles.add(new JLabel("Teléfono del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarUsuarioGUI().getTelefonoField());
+
+                cuadroDetalles.add(new JLabel("Dirección del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarUsuarioGUI().getDireccionField());
+            } 
+            else if (submodulo.equals("Insertar excedente")) {
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                cuadroDetalles.add(new JLabel("ID del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getIdLocalField());
+
+                cuadroDetalles.add(new JLabel("Descripción del excedente:"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getDescripcionExcedenteField());
+
+                cuadroDetalles.add(new JLabel("Cantidad del excedente:"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getCantidadExcedenteField());
+
+                cuadroDetalles.add(new JLabel("Unidad de medida del excedente:"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getUnidadMedidaField());
+
+                cuadroDetalles.add(new JLabel("Fecha de elaboración del excedente:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getFechaElaboracionField());
+
+                cuadroDetalles.add(new JLabel("Fecha de caducidad del excedente:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getFechaCaducidadField());
+
+                cuadroDetalles.add(new JLabel("Estado del excedente:"));
+                cuadroDetalles.add(proxyvista.getInsertarExcedenteGUI().getEstadoExcedenteCombo());
+            }
+            else if (submodulo.equals("Insertar donación")) {
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                cuadroDetalles.add(new JLabel("ID del excedente:"));
+                cuadroDetalles.add(proxyvista.getInsertarDonacionGUI().getIdExcedenteField());
+
+                cuadroDetalles.add(new JLabel("ID del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarDonacionGUI().getIdLocalDonanteField());
+
+                cuadroDetalles.add(new JLabel("Fecha de asignación:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarDonacionGUI().getFechaAsignacionField());
+
+                cuadroDetalles.add(new JLabel("Fecha de recolección:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarDonacionGUI().getFechaRecoleccionField());
+
+                cuadroDetalles.add(new JLabel("Estado de la donación:"));
+                cuadroDetalles.add(proxyvista.getInsertarDonacionGUI().getEstadoDonacionCombo());
+            }
+            else if (submodulo.equals("Insertar transporte")) {
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                cuadroDetalles.add(new JLabel("ID de la donación:"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getIdDonacionField());
+
+                cuadroDetalles.add(new JLabel("Descripción del vehículo:"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getDescripcionVehiculoField());
+
+                cuadroDetalles.add(new JLabel("Nombre del conductor:"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getNombreConductorField());
+
+                cuadroDetalles.add(new JLabel("Fecha de salida del vehículo:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getFechaSalidaVehiculoField());
+
+                cuadroDetalles.add(new JLabel("Fecha de entrega del vehículo:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getFechaEntregaVehiculoField());
+
+                cuadroDetalles.add(new JLabel("Estado:"));
+                cuadroDetalles.add(proxyvista.getInsertarTransporteGUI().getEstadoTransporteCombo());                
+            }
+            else if (submodulo.equals("Insertar recompensa")) {
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                cuadroDetalles.add(new JLabel("ID de la donación:"));
+                cuadroDetalles.add(proxyvista.getInsertarRecompensaGUI().getIdDonacionRecompensaField());
+
+                cuadroDetalles.add(new JLabel("ID del local donante:"));
+                cuadroDetalles.add(proxyvista.getInsertarRecompensaGUI().getIdLocalDonanteRecompensaField());
+
+                cuadroDetalles.add(new JLabel("Puntos obtenidos por la donación:"));
+                cuadroDetalles.add(proxyvista.getInsertarRecompensaGUI().getPuntosObtenidosField());
+
+                cuadroDetalles.add(new JLabel("Fecha de otorgación:  (D/M/A o D-M-A)"));
+                cuadroDetalles.add(proxyvista.getInsertarRecompensaGUI().getFechaOtorgacionField());
+            }
+          
+        } else if (modulo.equals("Obtener datos")) {           
+            if(submodulo.equals("Obtener excedentes por estado")){
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                // Cambiar la disposición de cuadroDetalles
+                cuadroDetalles.setLayout(new BoxLayout(cuadroDetalles, BoxLayout.Y_AXIS));
+                
+                JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel labelSeleccionarAjuste = new JLabel("Seleccionar ajuste de la tabla:");
+                comboBoxOpcionesAjuste = new JComboBox<>(new String[]{
+                    "Mostrar tabla con los 3 estados",
+                    "Mostrar tabla con estado 'Asignado'",
+                    "Mostrar tabla con estado 'Disponible'",
+                    "Mostrar tabla con estado 'Entregado'"
+                });
+                
+                panelSuperior.add(labelSeleccionarAjuste);
+                panelSuperior.add(comboBoxOpcionesAjuste);
+                
+                tableModel = new DefaultTableModel(new String[]{
+                    "ExcedenteID", "UsuarioID", "Descripcion", "Cantidad", "UnidadMedida", "FechaCreacion", "FechaCaducidad", "Estado"
+                }, 0);
+                
+                tableExcedentes = new JTable(tableModel);
+                tableExcedentes.setRowHeight(30); // Reducir altura de las filas para ajustarse
+                
+                JScrollPane scrollPane = new JScrollPane(tableExcedentes);
+                scrollPane.setPreferredSize(new Dimension(400, 350)); // Tamaño ajustado
+
+                JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonActualizar = new JButton("ACTUALIZAR AJUSTE DE LA TABLA");
+                panelInferior.add(buttonActualizar);
+                                
+                cuadroDetalles.add(panelSuperior);    // ComboBox en la parte superior
+                cuadroDetalles.add(scrollPane);      // Tabla en el centro
+                cuadroDetalles.add(panelInferior);    // Botón en la parte inferior
+                
+                buttonActualizar.addActionListener(e -> actualizarTablas(submodulo, textFieldNumero, comboBoxOpcionesAjuste, tableModel));
+            }
+            else if (submodulo.equals("Obtener donaciones por estado")) {
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                // Cambiar la disposición de cuadroDetalles
+                cuadroDetalles.setLayout(new BoxLayout(cuadroDetalles, BoxLayout.Y_AXIS));
+                
+                JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel labelSeleccionarAjuste = new JLabel("Seleccionar ajuste de la tabla:");
+                comboBoxOpcionesAjuste = new JComboBox<>(new String[]{
+                    "Mostrar tabla con los 2 estados",
+                    "Mostrar tabla con estado 'Asignado'",
+                    "Mostrar tabla con estado 'Recolectado'"
+                });  
+                panelSuperior.add(labelSeleccionarAjuste);
+                panelSuperior.add(comboBoxOpcionesAjuste);
+                
+                tableModel = new DefaultTableModel(new String[]{
+                    "DonacionID", "ExcedenteID", "OrganizacionID", "FechaAsignacion", "FechaRecoleccion", "Estado"
+                }, 0);
+                
+                tableDonaciones = new JTable(tableModel);                
+                tableDonaciones.setRowHeight(30); // Reducir altura de las filas para ajustarse
+                JScrollPane scrollPane = new JScrollPane(tableDonaciones);
+                scrollPane.setPreferredSize(new Dimension(400, 350)); // Tamaño ajustado
+                
+                JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonActualizar = new JButton("ACTUALIZAR AJUSTE DE LA TABLA");
+                panelInferior.add(buttonActualizar);
+                                
+                cuadroDetalles.add(panelSuperior);    // ComboBox en la parte superior
+                cuadroDetalles.add(scrollPane);      // Tabla en el centro
+                cuadroDetalles.add(panelInferior);    // Botón en la parte inferior               
+                
+                buttonActualizar.addActionListener(e -> actualizarTablas(submodulo, textFieldNumero, comboBoxOpcionesAjuste, tableModel));            
+            }
+            else if (submodulo.equals("Obtener recompensas por usuario")){
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                // Cambiar la disposición de cuadroDetalles
+                cuadroDetalles.setLayout(new BoxLayout(cuadroDetalles, BoxLayout.Y_AXIS));
+                
+                JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel labelSeleccionarAjuste = new JLabel("Ingresar número de ID del local donante:");
+                textFieldNumero = new JTextField(10);  // 10 es el número de caracteres visibles en el campo
+                panelSuperior.add(labelSeleccionarAjuste);
+                panelSuperior.add(textFieldNumero);
+                
+                tableModel = new DefaultTableModel(new String[]{
+                    "RecompensaID", "DonacionID", "UsuarioID", "Puntos", "FechaOtorgacion"
+                }, 0);
+                
+                tableRecompensas = new JTable(tableModel);
+                tableRecompensas.setRowHeight(30); // Reducir altura de las filas para ajustarse
+                JScrollPane scrollPane = new JScrollPane(tableRecompensas);
+                scrollPane.setPreferredSize(new Dimension(400, 350)); // Tamaño ajustado 
+                
+                JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonActualizar = new JButton("ACTUALIZAR AJUSTE DE LA TABLA");
+                panelInferior.add(buttonActualizar);  
+                                
+                cuadroDetalles.add(panelSuperior);    // ComboBox en la parte superior
+                cuadroDetalles.add(scrollPane);      // Tabla en el centro
+                cuadroDetalles.add(panelInferior);    // Botón en la parte inferior                               
+
+                buttonActualizar.addActionListener(e -> actualizarTablas(submodulo, textFieldNumero, comboBoxOpcionesAjuste, tableModel));
+            }
+            else if (submodulo.equals("Obtener rangos por tipo de recompensa")){  
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                // Cambiar la disposición de cuadroDetalles
+                cuadroDetalles.setLayout(new BoxLayout(cuadroDetalles, BoxLayout.Y_AXIS));
+                
+                JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel labelSeleccionarAjuste = new JLabel("Seleccionar ajuste de la tabla:");
+                comboBoxOpcionesAjuste = new JComboBox<>(new String[]{
+                    "Mostrar tabla con los 2 tipos de recompensas",
+                    "Mostrar tabla con tipo de recompensa 'Física'",
+                    "Mostrar tabla con tipo de recompensa 'No Física'"
+                });
+                
+                panelSuperior.add(labelSeleccionarAjuste);
+                panelSuperior.add(comboBoxOpcionesAjuste); 
+                
+                tableModel = new DefaultTableModel(new String[]{
+                    "DetallesID", "MinPuntos", "MaxPuntos", "TipoRecompensa", "Descripcion"
+                }, 0);
+                
+                tableRangos = new JTable(tableModel);
+                tableRangos.setRowHeight(30); // Reducir altura de las filas para ajustarse
+                JScrollPane scrollPane = new JScrollPane(tableRangos);
+                scrollPane.setPreferredSize(new Dimension(400, 350)); // Tamaño ajustado                 
+
+                JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonActualizar = new JButton("ACTUALIZAR AJUSTE DE LA TABLA");
+                panelInferior.add(buttonActualizar);
+                
+                cuadroDetalles.add(panelSuperior);    // ComboBox en la parte superior
+                cuadroDetalles.add(scrollPane);      // Tabla en el centro
+                cuadroDetalles.add(panelInferior);    // Botón en la parte inferior                                     
+
+                buttonActualizar.addActionListener(e -> actualizarTablas(submodulo, textFieldNumero, comboBoxOpcionesAjuste, tableModel));            
+            }
+            else if (submodulo.equals("Obtener transporte por estado")){
+                ColorearBoton(submodulo, submoduloBtn);
+                
+                // Cambiar la disposición de cuadroDetalles
+                cuadroDetalles.setLayout(new BoxLayout(cuadroDetalles, BoxLayout.Y_AXIS));
+                
+                JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel labelSeleccionarAjuste = new JLabel("Seleccionar ajuste de la tabla:");
+                comboBoxOpcionesAjuste = new JComboBox<>(new String[]{
+                    "Mostrar tabla con los 3 estados",
+                    "Mostrar tabla con estado 'Completado'",
+                    "Mostrar tabla con estado 'En Progreso'",
+                    "Mostrar tabla con estado 'Planificado'"
+                });
+                
+                panelSuperior.add(labelSeleccionarAjuste);
+                panelSuperior.add(comboBoxOpcionesAjuste); 
+                
+                tableModel = new DefaultTableModel(new String[]{
+                    "RutaID", "DonacionID", "Vehiculo", "Conductor", "FechaInicio", "FechaFin", "Estado"
+                }, 0);
+                
+                tableTransportes = new JTable(tableModel);    
+                tableTransportes.setRowHeight(30); // Reducir altura de las filas para ajustarse
+                JScrollPane scrollPane = new JScrollPane(tableTransportes);
+                scrollPane.setPreferredSize(new Dimension(400, 350)); // Tamaño ajustado   
+               
+                JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonActualizar = new JButton("ACTUALIZAR AJUSTE DE LA TABLA");
+                panelInferior.add(buttonActualizar);
+                               
+                cuadroDetalles.add(panelSuperior);    // ComboBox en la parte superior
+                cuadroDetalles.add(scrollPane);      // Tabla en el centro
+                cuadroDetalles.add(panelInferior);    // Botón en la parte inferior                                                     
+                
+                buttonActualizar.addActionListener(e -> actualizarTablas(submodulo, textFieldNumero, comboBoxOpcionesAjuste, tableModel));
+            }  
+        }
+        // Actualizamos el layout
+        cuadroDetalles.revalidate();
+        // Refrescamos el componente visualmente
+        cuadroDetalles.repaint();
+    }
+    
+    private void agregarDatos(){
+        proxyvista.agregarDatosProxy(submoduloActual, new FacadeControlador());
+    }
+    
+    private void limpiarCampos(){
+        proxyvista.limpiarCamposProxy(submoduloActual);
+    }
+    
+    private void actualizarTablas(String submodulo, JTextField textFieldNumero, JComboBox<String> comboBoxOpcionesAjuste,DefaultTableModel tableModel){
+        if (submodulo.equals("Obtener excedentes por estado")){
+            observervista = new ObserverVista("'Excedentes'");
+            sujetoobserver.añadir(observervista);        
+            sujetoobserver.actualizar(submodulo, textFieldNumero, comboBoxOpcionesAjuste, new FacadeControlador(), tableModel);
+            sujetoobserver.eliminar(observervista);
+        }
+        
+        if (submodulo.equals("Obtener donaciones por estado")){
+            observervista = new ObserverVista("'Donaciones'");
+            sujetoobserver.añadir(observervista);            
+            sujetoobserver.actualizar(submodulo, textFieldNumero, comboBoxOpcionesAjuste, new FacadeControlador(), tableModel);
+            sujetoobserver.eliminar(observervista);
+        }
+        
+        if (submodulo.equals("Obtener recompensas por usuario")){
+            observervista = new ObserverVista("'Recompensas'");
+            sujetoobserver.añadir(observervista);            
+            sujetoobserver.actualizar(submodulo, textFieldNumero, comboBoxOpcionesAjuste, new FacadeControlador(), tableModel);
+            sujetoobserver.eliminar(observervista);
+        }  
+        
+        if (submodulo.equals("Obtener rangos por tipo de recompensa")){
+            observervista = new ObserverVista("'DetallesDeRecompensas'");
+            sujetoobserver.añadir(observervista);            
+            sujetoobserver.actualizar(submodulo, textFieldNumero, comboBoxOpcionesAjuste, new FacadeControlador(), tableModel);
+            sujetoobserver.eliminar(observervista);
+        }
+        
+        if (submodulo.equals("Obtener transporte por estado")){
+            observervista = new ObserverVista("'Transporte'");
+            sujetoobserver.añadir(observervista);            
+            sujetoobserver.actualizar(submodulo, textFieldNumero, comboBoxOpcionesAjuste, new FacadeControlador(), tableModel);
+            sujetoobserver.eliminar(observervista);
+        }
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package Vista;
+
+import javax.swing.SwingUtilities;
+
+public class MainGUI {
+
+    public static void main(String[] args) {
+
+        SwingUtilities.invokeLater(() -> new VentanaGUI());
+    }
+}
